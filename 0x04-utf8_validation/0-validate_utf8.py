@@ -1,37 +1,40 @@
 #!/usr/bin/python3
-"""module for UTF-8 validation"""
+"""A method that determines if a given data set represents a valid UTF-8 encoding"""
 
 
 def validUTF8(data):
-    """Establishes if given data represents valid UTF_8 encoding
-    Args: data: list of int
-    Returns: True if valid UTF-8, otherwise False
     """
-    # num of bytes in UTF-8 set
-    num_bytes = 0
-    # mask to check if first significant bit is set or not
-    mask_1 = 1 << 7
-    #mask to check if second significant bit is set or not
-    mask_2 = 1 << 6
+    bit1:checks if significant byte is 1
+    bit2:checks if second significant byte is 0
+    nbytes:keeps track of how many 1s before 0 occurs
+    data:represented by a list of integers to check
+    """
+
+    bit1 = 1 << 7
+    bit2 = 1 << 6
+    nbytes = 0
+
+    if not data or len(data) == 0:
+        return True
 
     for num in data:
-        # gets significany bit in byte if starting byte
-        mask = 1 << 7
-        if num_bytes == 0:
-            while mask & num:
-                num_bytes += 1
-                mask = mask >> 1
+        bit = 1 << 7
+        if nbytes == 0:
+            while (bit & num):
+                nbytes += 1
+                bit = bit >> 1
 
-            if num_bytes == 0:
+            if nbytes == 0:
                 continue
-
-            if num_bytes == 1 or num_bytes > 4:
+            if nbytes == 1 or nbytes > 4:
                 return False
-            
         else:
-            # if part of UTF-8 character, look at the two significant bits
-            if not ((num & mask_1) and not (num & mask_2)):
-                return False
-        num_bytes -= 1
-    return num_bytes == 0
 
+            if not (num & bit1 and not (num & bit2)):
+                return False
+        nbytes -= 1
+
+    if nbytes:
+        return False
+    else:
+        return True
